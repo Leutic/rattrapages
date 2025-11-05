@@ -21,7 +21,7 @@ Dans une application traditionnelle (appelée "monolithique"), si une petite par
 
 Avec les microservices, si le service de facturation tombe en panne, les clients peuvent toujours créer des comptes et passer des commandes. L'architecture est plus **résiliente** et **scalable** (on peut ajouter plus de puissance uniquement là où c'est nécessaire).
 
-### Comment les services communiquent-ils ?
+### Comment les services communiquent-ils 
 
 Ce projet utilise **Apache Kafka**, un système de messagerie ultra-rapide et fiable. Quand un événement important se produit (comme la création d'une commande), le service concerné publie un message dans Kafka. Les autres services intéressés par cet événement s'y abonnent et réagissent en conséquence.
 
