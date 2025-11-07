@@ -187,7 +187,7 @@ services:
       # GF_SECURITY_ADMIN_USER: admin
       # GF_SECURITY_ADMIN_PASSWORD: password
       GF_AUTH_ANONYMOUS_ENABLED: "true" # Accès anonyme pour la démo
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
       GF_AUTH_DISABLE_LOGIN_FORM: "true" # Désactive le formulaire de login
     depends_on:
       - prometheus # Grafana a besoin de Prometheus comme source de données
