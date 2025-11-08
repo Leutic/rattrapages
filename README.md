@@ -200,27 +200,37 @@ curl -X POST http://localhost/api/orders \
 
 > **Note :** Vous accédez à l'endpoint via **NGINX** sur le port 80 (http://localhost/api/orders), pas directement sur http://localhost:8002.
 
+
 ### Observer les logs
 
--   Dans les logs du `order-service`, vous verrez que la commande a été créée.
--   Dans les logs du `invoice-service`, vous verrez qu'il a reçu l'événement et créé une facture.
--   Dans les logs du `notification-service`, vous verrez qu'il a reçu l'événement et simulé l'envoi d'une notification.
+-   Dans les logs du `order-service`, vous verrez que la commande a été créée et un événement publié sur Kafka.
+-   Dans les logs du `invoice-service`, vous verrez qu'il a reçu l'événement, créé une facture, et publié un nouvel événement.
+-   Dans les logs du `notification-service`, vous verrez qu'il a reçu l'événement de facture et a simulé l'envoi d'une notification.
 
-### Générer du trafic pour voir les métriques
+### **Générer du trafic pour les tests de charge (Phase 3.2)**
 
-Pour voir les données dans Grafana, générez du trafic continu :
+Pour tester la résilience et la scalabilité, vous pouvez utiliser les scripts que vous avez créés.
 
-```sh
-while true; do
-  curl -X POST http://localhost/api/orders \
-    -H "Content-Type: application/json" \
-    -d "{\"userId\": 1, \"productDescription\": \"Test\", \"quantity\": 5, \"totalPrice\": 100.00}" \
-    -s > /dev/null
-  sleep 0.5
-done
-```
+1.  **Pour Linux/WSL (Bash) :**
+    Naviguez à la racine de votre projet et rendez le script exécutable si ce n'est pas déjà fait :
+    ```sh
+    chmod +x charge_test.sh
+    ```
+    Puis lancez le script, par exemple, pour 60 secondes avec 10 requêtes par seconde :
+    ```sh
+    ./charge_test.sh 60 10
+    ```
+    Vous pouvez ajuster `DURATION` (durée en secondes) et `REQUESTS_PER_SEC` (requêtes par seconde).
 
-Laissez ce script tourner **1-2 minutes**, puis rafraîchissez Grafana (F5). Vous verrez les panneaux se remplir de données en temps réel ! 📊
+2.  **Pour Windows (PowerShell) :**
+    Ouvrez PowerShell, naviguez à la racine de votre projet et lancez le script :
+    ```powershell
+    .\charge_test.ps1 -Duration 60 -RequestsPerSec 10
+    ```
+    Vous pouvez ajuster `-Duration` et `-RequestsPerSec`.
+
+**Pendant que les scripts tournent, observez votre dashboard Grafana !** Vous devriez voir les graphiques s'animer, indiquant l'augmentation du nombre de requêtes, l'utilisation CPU des services, etc.
+
 
 ## 7. Structure du projet
 

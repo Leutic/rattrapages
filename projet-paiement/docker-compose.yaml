@@ -69,6 +69,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+
     restart: on-failure
 
   order-service:
@@ -97,6 +104,13 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8002/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s # Donne plus de temps à Spring Boot pour démarrer
+
     restart: on-failure
 
   invoice-service:
@@ -129,6 +143,12 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8003/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s # Donne plus de temps à Spring Boot pour démarrer
     restart: on-failure
 
   notification-service:
@@ -151,6 +171,12 @@ services:
     depends_on:
       kafka:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8004/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 45s # Donne plus de temps à Spring Boot pour démarrer
     restart: on-failure
 
   nginx:
@@ -161,8 +187,10 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - auth-service
-      - order-service
+      auth-service:
+        condition: service_healthy # Attendre que auth-service soit sain
+      order-service:
+        condition: service_healthy 
     restart: on-failure
 
   prometheus:
@@ -174,10 +202,14 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command: --config.file=/etc/prometheus/prometheus.yml --web.enable-remote-write-receiver
     depends_on:
-      - auth-service
-      - order-service
-      - invoice-service
-      - notification-service
+      auth-service:
+        condition: service_healthy # Attendre que auth-service soit sain
+      order-service:
+        condition: service_healthy # Attendre que order-service soit sain
+      invoice-service:
+        condition: service_healthy # Attendre que invoice-service soit sain
+      notification-service:
+        condition: service_healthy
     restart: on-failure
 
   grafana:
