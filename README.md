@@ -61,6 +61,8 @@ cd projet-paiement
 
 ### Étape 2 : Construisez les microservices
 
+> ⚠️ **À faire UNE FOIS au démarrage initial, puis À CHAQUE FOIS que vous modifiez le code source des microservices**
+
 Avant de lancer Docker Compose, vous devez construire les JAR de chaque microservice. Ces fichiers JAR seront copiés dans les images Docker (voir les `Dockerfile`).
 
 ```sh
@@ -77,7 +79,11 @@ cd ../../
 
 > **Astuce :** La première fois, cette étape peut prendre quelques minutes car Maven télécharge les dépendances. Les fois suivantes, ce sera beaucoup plus rapide.
 
+**⚠️ Important :** Si vous ne faites pas ce build et que vous lancez `docker-compose up`, Docker ne trouvera pas les fichiers JAR et les conteneurs vont crash !
+
 ### Étape 3 : Lancez Docker Compose
+
+> ⚠️ **À faire chaque fois que vous voulez démarrer votre application**
 
 À la racine du projet (où se trouve le fichier `docker-compose.yaml`), exécutez :
 
@@ -105,6 +111,8 @@ Vous devriez voir les logs de tous les services s'afficher dans votre terminal. 
 Vous devriez voir tous les services listés avec le statut **UP** (en vert). Cela confirme que Prometheus scrape correctement les métriques de vos microservices.
 
 ## 5. Monitoring avec Grafana
+
+> ⚠️ **À faire UNE FOIS après le premier lancement** (configuration initiale uniquement)
 
 Maintenant que vos services fonctionnent, configurez Grafana pour visualiser les métriques en temps réel.
 
@@ -170,6 +178,8 @@ Vous verrez maintenant un dashboard avec 4 panneaux :
 -   **Bas droit :** Nombre de commandes par seconde (requêtes/sec)
 
 ## 6. Comment tester le flux ?
+
+> ✅ **À faire à chaque fois que vous voulez tester votre application**
 
 Maintenant que tous les services sont lancés et le monitoring configuré, testez le flux complet.
 
@@ -243,6 +253,8 @@ projet-paiement/
 
 ## 8. Arrêter l'application
 
+> ✅ **À faire quand vous avez fini de développer**
+
 Pour arrêter tous les conteneurs, à la racine du projet :
 
 ```sh
@@ -255,7 +267,21 @@ Pour arrêter et supprimer aussi les volumes de données :
 docker-compose down -v
 ```
 
-## 9. Architecture Dockerfile
+## 9. Résumé : Quand faire quoi ?
+
+| Action | Moment | Commande |
+|--------|--------|----------|
+| **Build des JAR** | 🔴 Démarrage initial + À chaque modification du code | `mvnw clean package` (x4) |
+| **Lancer Docker** | Chaque démarrage | `docker-compose up --build` |
+| **Configurer Prometheus/Grafana** | 🟢 UNE SEULE FOIS (config initiale) | Via l'interface web |
+| **Tester les endpoints** | À chaque fois qu'on développe | `curl -X POST...` |
+| **Arrêter** | À la fin de la session | `docker-compose down` |
+
+**Légende :**
+- 🔴 = Important : Ne pas oublier !
+- 🟢 = À faire une seule fois
+
+## 10. Architecture Dockerfile
 
 Chaque microservice utilise un `Dockerfile` optimisé :
 
@@ -275,7 +301,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 > **Important :** C'est pourquoi vous devez faire `mvnw clean package` avant de lancer `docker-compose up --build`. Sinon, les fichiers JAR n'existeront pas.
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 ### Les services mettent longtemps à démarrer
 
