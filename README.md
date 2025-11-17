@@ -80,4 +80,7 @@ Dans les logs du notification-service, vous verrez qu'il a reçu l'événement d
 
 Arrêter l'application : docker-compose down
 
+
+Misaotra betsaka dia veloma eee
+
 docker-compose down
